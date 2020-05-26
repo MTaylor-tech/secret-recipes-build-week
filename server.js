@@ -35,8 +35,9 @@ const sessionConfig = {
 // global middleware
 server.use(helmet());
 var allowedOrigins = ['http://localhost:3000',
-                      'https://secretfamilyrecipes1.netlify.app/'];
+                      'https://secretfamilyrecipes1.netlify.app'];
 app.use(cors({
+
   origin: function(origin, callback){
     // allow requests with no origin
     // (like mobile apps or curl requests)
@@ -47,7 +48,11 @@ app.use(cors({
       return callback(new Error(msg), false);
     }
     return callback(null, true);
-  }
+  },
+
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+
+  credentials: true,
 }));
 server.use(session(sessionConfig));
 server.use(express.json());
