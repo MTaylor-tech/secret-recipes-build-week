@@ -39,6 +39,7 @@ var allowedOrigins = ['http://localhost:3000',
 app.use(cors({
 
   origin: function(origin, callback){
+    return callback(null,true);
     // allow requests with no origin
     // (like mobile apps or curl requests)
     if(!origin) return callback(null, true);
@@ -50,7 +51,7 @@ app.use(cors({
     return callback(null, true);
   },
 
-  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
 
   credentials: true,
 }));
