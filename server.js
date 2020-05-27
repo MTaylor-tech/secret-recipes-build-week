@@ -1,66 +1,112 @@
 const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors')
-const session = require('express-session')
-const restricted = require("./auth/restricted-middleware.js")
-const knexSessionStore = require("connect-session-knex")(session);
-const server = express();
+const request = require('request');
+const cors = require('cors');
 
-const usersRouter =  require('./router/usersRouter');
-const recipesRouter = require('./router/recipesRouter.js');
-const authRouter = require('./auth/auth-router.js')
+const app = express();
 
-const sessionConfig = {
-  name: 'cookie',
-  secret: "starwars",
-  cookie: {
-    maxAge: 3600 * 1000,
-    secure: false, // should be true in production
-    httpOnly: true
-  },
-  resave: false,
-  saveUninitialized:false,
-  // store session information into database
-  store: new knexSessionStore(
-    {
-      knex: require("./data/db-config"),
-      tablename: "sessions",
-      sidfieldname: "sid",
-      createtable: true,
-      clearInterval: 3600 * 1000
+app.use(cors());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
+app.get('/api/recipes', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/api/recipes' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
+
+      res.json(JSON.parse(body));
     }
   )
-}
+});
 
-// global middleware
-server.use(helmet());
-var allowedOrigins = ['http://localhost:3000',
-                      'https://secretfamilyrecipes1.netlify.app'];
-app.use(cors({
+app.post('/api/recipes', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/api/recipes' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
 
-  origin: function(origin, callback){
-    return callback(null,true);
-    // allow requests with no origin
-    // (like mobile apps or curl requests)
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
-      var msg = 'The CORS policy for this site does not ' +
-                'allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+      res.json(JSON.parse(body));
     }
-    return callback(null, true);
-  },
+  )
+});
 
-  exposedHeaders: ['Content-Length', 'Content-Type'],
+app.get('/api/recipes', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/api/recipes' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
 
-  credentials: true,
-}));
-server.use(session(sessionConfig));
-server.use(express.json());
+      res.json(JSON.parse(body));
+    }
+  )
+});
+
+app.get('/api/users', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/api/users' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
+
+      res.json(JSON.parse(body));
+    }
+  )
+});
+
+app.post('/auth/login', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/auth/login' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
+
+      res.json(JSON.parse(body));
+    }
+  )
+});
+
+app.post('/auth/register', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/auth/register' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
+
+      res.json(JSON.parse(body));
+    }
+  )
+});
+
+app.get('/auth/logout', (req, res) => {
+  request(
+    { url: 'https://secretrecipesbuild.herokuapp.com/auth/logout' },
+    (error, response, body) => {
+      if (error || response.statusCode !== 200) {
+        return res.status(500).json({ type: 'error', message: err.message });
+      }
+
+      res.json(JSON.parse(body));
+    }
+  )
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`listening on ${PORT}`));
 
 // routers
-server.use('/api', restricted, usersRouter)
-server.use('/api', restricted, recipesRouter)
+server.use('/api', usersRouter)
+server.use('/api', recipesRouter)
 server.use('/auth', authRouter)
 
 server.get('/', (req, res) => {
