@@ -103,14 +103,3 @@ app.get('/auth/logout', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
-
-// routers
-server.use('/api', usersRouter)
-server.use('/api', recipesRouter)
-server.use('/auth', authRouter)
-
-server.get('/', (req, res) => {
-    res.send('<h3>Welcome to our Family Secrets Recipes</h3>');
-  });
-
- module.exports = server;
