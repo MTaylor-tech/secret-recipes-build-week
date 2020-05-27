@@ -60,8 +60,8 @@ server.use(session(sessionConfig));
 server.use(express.json());
 
 // routers
-server.use('/api', restricted, usersRouter)
-server.use('/api', restricted, recipesRouter)
+server.use('/api', usersRouter)
+server.use('/api', recipesRouter)
 server.use('/auth', authRouter)
 
 server.get('/', (req, res) => {
